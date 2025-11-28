@@ -1,5 +1,2 @@
 flet
-pandas
 openpyxl
-reportlab
-Pillow
