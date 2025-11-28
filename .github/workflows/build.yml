@@ -22,8 +22,13 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install flet
-          # 安装 requirements.txt 中的库，用于检查是否有版本冲突
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -32,9 +37,10 @@ jobs:
 
       - name: Build APK
         run: |
-          # 简化命令，移除 --include-packages，让它自动读取 requirements.txt
-          # 注意：移除了中文名称，避免编码导致 exit code 2
-          flet build apk --project-name "FurnaceCalc" --product-name "FurnaceApp" --org "com.furnace.app"
+          # 关键修改：
+          # 1. 添加了 -vv 参数 (显示详细日志，方便查错)
+          # 2. 命令最后添加了一个空格和一个点 . (明确告诉它打包当前目录)
+          flet build apk -vv --project-name "FurnaceCalc" --product-name "FurnaceApp" --org "com.furnace.app" .
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
