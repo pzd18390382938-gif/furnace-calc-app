@@ -1,0 +1,42 @@
+name: Build Android APK
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+
+      - name: Install Flet
+        run: pip install flet
+
+      - name: Build APK
+        run: |
+          # 这一步是关键，Flet 会自动将 Python 打包进 APK
+          flet build apk --project-name "FurnaceCalc" --product-name "炉衬计算" --org "com.yourname.furnace" --include-packages flet,pandas,openpyxl,reportlab,Pillow
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: FurnaceCalc-APK
+          path: build/apk/app-release.apk
